@@ -66,7 +66,26 @@ const FilmDetail = (props) => {
   const { idFilm } = props.navigation.state.params;
   const [filmDetails, setFilmDetails] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
-  // console.log(props);
+
+  useEffect(() => {
+    const favoriteFilmIndex = props.favoriteFilms.findIndex(
+      (item) => item.id === idFilm
+    );
+    if (favoriteFilmIndex !== -1) {
+      // Film déjà dans nos favoris, on a déjà son détail
+      // Pas besoin d'appeler l'API ici, on ajoute le détail stocké dans notre state global au state de notre component
+      setFilmDetails(props.favoriteFilms[favoriteFilmIndex]);
+      return;
+    }
+    // else
+    getFilmDetailFromApi(idFilm)
+      .then((data) => {
+        setFilmDetails(data);
+      })
+      .then(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   const displayLoading = () => {
     if (isLoading) {
@@ -79,7 +98,7 @@ const FilmDetail = (props) => {
     return null;
   };
 
-  useEffect(() => {
+  /*   useEffect(() => {
     getFilmDetailFromApi(idFilm)
       .then((data) => {
         setFilmDetails(data);
@@ -87,7 +106,7 @@ const FilmDetail = (props) => {
       .then(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, []); */
 
   const toggleFavorite = () => {
     const action = { type: 'TOGGLE_FAVORITE', value: filmDetails };

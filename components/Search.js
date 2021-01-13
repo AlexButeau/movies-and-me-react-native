@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+/* eslint-disable max-len */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-underscore-dangle */
@@ -108,6 +110,7 @@ const Search = (props) => {
         loadFilms={_loadFilms} // again, the Search component handles getting more films from the API when needed
         page={page}
         totalPages={totalPages} // les infos page et totalPages vont être utile, côté component FilmList, pour ne pas déclencher l'évènement pour charger plus de film si on a atteint la dernière page
+        favoritesList={false}
       />
       {displayLoading()}
     </View>

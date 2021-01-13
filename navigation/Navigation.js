@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable global-require */
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
@@ -20,6 +22,24 @@ const SearchStackNavigator = createStackNavigator({
       title: '',
     },
   },
+  Favorites: {
+    screen: Favorites,
+    navigationOptions: {
+      title: 'Favorites',
+    },
+  },
+});
+
+const FavoritesStackNavigator = createStackNavigator({
+  Favorites: {
+    screen: Favorites,
+    navigationOptions: {
+      title: 'Favoris',
+    },
+  },
+  FilmDetail: {
+    screen: FilmDetail,
+  },
 });
 
 const MoviesTabNavigator = createBottomTabNavigator(
@@ -27,27 +47,23 @@ const MoviesTabNavigator = createBottomTabNavigator(
     Search: {
       screen: SearchStackNavigator,
       navigationOptions: {
-        tabBarIcon: () => {
-          return (
-            <Image
-              source={require('../images/ic_search.png')}
-              style={styles.icon}
-            />
-          );
-        },
+        tabBarIcon: () => (
+          <Image
+            source={require('../images/ic_search.png')}
+            style={styles.icon}
+          />
+        ),
       },
     },
     Favorites: {
-      screen: Favorites,
+      screen: FavoritesStackNavigator,
       navigationOptions: {
-        tabBarIcon: () => {
-          return (
-            <Image
-              source={require('../images/ic_favorite.png')}
-              style={styles.icon}
-            />
-          );
-        },
+        tabBarIcon: () => (
+          <Image
+            source={require('../images/ic_favorite.png')}
+            style={styles.icon}
+          />
+        ),
       },
     },
   },
