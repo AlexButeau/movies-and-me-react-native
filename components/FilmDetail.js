@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 /* eslint-disable react/destructuring-assignment */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import moment from 'moment';
 import numeral from 'numeral';
 import {
@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   Image,
   TouchableOpacity,
+  Share,
+  Platform,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
@@ -60,10 +62,30 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
+  share_touchable_floatingactionbutton: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    right: 30,
+    bottom: 30,
+    borderRadius: 30,
+    backgroundColor: '#e91e63',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  share_image: {
+    width: 30,
+    height: 30,
+  },
+  share_touchable_headerrightbutton: {
+    marginRight: 8,
+  },
 });
 
 const FilmDetail = (props) => {
   const { idFilm } = props.navigation.state.params;
+  // const navigation = props.navigation;
+  const params = props.navigation.state.params;
   const [filmDetails, setFilmDetails] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -87,6 +109,21 @@ const FilmDetail = (props) => {
       });
   }, []);
 
+  // Fonction pour faire passer la fonction _shareFilm et le film aux paramètres de la navigation. Ainsi on aura accès à ces données au moment de définir le headerRight
+  const updateNavigationParams = () => {
+    props.navigation.setParams({
+      shareFilm: shareFilm,
+      film: filmDetails,
+    });
+  };
+
+  // Dès que le film est chargé, on met à jour les paramètres de la navigation (avec la fonction updateNavigationParams) pour afficher le bouton de partage
+  useEffect(() => {
+    if (filmDetails !== undefined) {
+      updateNavigationParams();
+    }
+  }, [filmDetails]);
+
   const displayLoading = () => {
     if (isLoading) {
       return (
@@ -98,6 +135,26 @@ const FilmDetail = (props) => {
     return null;
   };
 
+  const shareFilm = () => {
+    Share.share({ title: filmDetails.title, message: filmDetails.overview });
+  };
+
+  const displayFloatingActionButton = () => {
+    // this is specific to Android
+    if (filmDetails !== undefined && Platform.OS === 'android') {
+      return (
+        <TouchableOpacity
+          style={styles.share_touchable_floatingactionbutton}
+          onPress={() => shareFilm()}
+        >
+          <Image
+            style={styles.share_image}
+            source={require('../images/ic_share.png')}
+          />
+        </TouchableOpacity>
+      );
+    }
+  };
   /*   useEffect(() => {
     getFilmDetailFromApi(idFilm)
       .then((data) => {
@@ -176,6 +233,7 @@ const FilmDetail = (props) => {
     <View style={styles.main_container}>
       {displayFilmDetails()}
       {displayLoading()}
+      {displayFloatingActionButton()}
     </View>
   );
 };
@@ -183,5 +241,26 @@ const FilmDetail = (props) => {
 const mapStateToProps = (state) => ({
   favoriteFilms: state.favoriteFilms,
 });
+
+FilmDetail.navigationOptions = ({ navigation }) => {
+  const { params } = navigation.state;
+  // On accède à la fonction shareFilm et au film via les paramètres qu'on a ajouté à la navigation
+  if (params.film != undefined && Platform.OS === 'ios') {
+    return {
+      // On a besoin d'afficher une image, il faut donc passer par une Touchable une fois de plus
+      headerRight: (
+        <TouchableOpacity
+          style={styles.share_touchable_headerrightbutton}
+          onPress={() => params.shareFilm()}
+        >
+          <Image
+            style={styles.share_image}
+            source={require('../images/ic_share.png')}
+          />
+        </TouchableOpacity>
+      ),
+    };
+  }
+};
 
 export default connect(mapStateToProps)(FilmDetail);

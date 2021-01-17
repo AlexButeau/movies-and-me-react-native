@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable no-console */
 
-const REACT_APP_API_TOKEN = '-----';
+const REACT_APP_API_TOKEN = '------';
 // const API_TOKEN = process.env.REACT_APP_API_TOKEN;
 
 export const getFilmsFromApiWithSearchedText = (text, page) => {
